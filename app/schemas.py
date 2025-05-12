@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field, field_validator, ConfigDict
 from whisperx import utils
 
 WHISPER_MODEL = os.getenv("WHISPER_MODEL")
-LANG = os.getenv("DEFAULT_LANG", "en")
+LANG = os.getenv("DEFAULT_LANG", "en")  # bleibt vorhanden, wird aber nicht mehr als Default genutzt
 
 
 class Response(BaseModel):
@@ -273,14 +273,17 @@ class VADOptions(BaseModel):
     )
 
 
+# ---------------------------------------------------------------------------
+# WhisperModelParams
+# ---------------------------------------------------------------------------
 class WhisperModelParams(BaseModel):
     """Model for Whisper model parameters."""
 
-    language: str = Field(
+    # Hauptänderung: Sprache ist jetzt optional. Kein enum, Default = None
+    language: Optional[str] = Field(
         Query(
-            default=LANG,
-            description="Language to transcribe",
-            enum=list(utils.LANGUAGES.keys()),
+            default=None,  # None ⇒ WhisperX benutzt automatische Spracherkennung
+            description="Language to transcribe (leave empty for autodetect)",
         )
     )
     task: TaskEnum = Field(
